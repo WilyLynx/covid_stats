@@ -8,7 +8,7 @@ class BasePlotter:
         self.stats = stats
 
     def plot_active(self):
-        sns.set(rc={'figure.figsize': (11, 6)})
+        sns.set(rc={'figure.figsize': (10, 6)})
         sns.set_style("whitegrid")
         ax = sns.lineplot(x=self.stats.index, y=self.stats["aktywni"])
         ax.set_title(f'Aktywne przypadki covid-19 w powiecie mińskim\n Dane z dnia {datetime.date.today()}')

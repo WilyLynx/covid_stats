@@ -19,7 +19,7 @@ class MinskPSSEParser:
     @staticmethod
     def _build_data_frame(covid_stats):
         covid_stats = pd.DataFrame(covid_stats,
-                                   columns=['data', 'kwarantanna', 'hospitalizowani', 'potwierdzeni', 'ozdrowieńcy'])
+                                   columns=['data', 'kwarantanna', 'hospitalizowani', 'potwierdzeni', 'ozdrowieńcy', 'zmarli'])
         covid_stats.loc[:, 'data'] = pd.to_datetime(covid_stats['data'], format='%d.%m.%Y')
         covid_stats: DataFrame = covid_stats.set_index('data')
         return covid_stats
@@ -67,7 +67,14 @@ class MinskPSSEParser:
                     msg_data.append(None)
 
                 try:
-                    msg_data.append(int([r for r in rows if 'ozdrowieńców' in str(r)][0].contents[3].contents[0]))
+                    row = str([r for r in rows if 'ozdrowieńców' in str(r)][0])
+                    num = re.search('[0-9]+', row)[0]
+                    msg_data.append(int(num))
+                except Exception:
+                    msg_data.append(None)
+
+                try:
+                    msg_data.append(int([r for r in rows if 'zgonów' in str(r)][0].contents[3].contents[0]))
                 except Exception:
                     msg_data.append(None)
 
