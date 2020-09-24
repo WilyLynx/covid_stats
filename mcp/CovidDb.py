@@ -20,9 +20,9 @@ class CovidDb(DbConnector):
 
     def table_exists(self):
         return self.conn.execute(f'''
-            SELECT name 
+            SELECT count(name) 
             FROM sqlite_master 
             WHERE type='table' AND name='{self.table_name}';
-        ''').rowcount > 0
+        ''').fetchone()[0] == 1
 
 
