@@ -32,6 +32,8 @@ if download_new_data:
     stats['aktywni'] = stats['potwierdzeni'] - stats['ozdrowieńcy'] - stats['zmarli']
     db_ctx.insertStats(stats)
 
+db_ctx.close()
+
 plotter = BasePlotter(stats)
 
 plotter.plot_active()

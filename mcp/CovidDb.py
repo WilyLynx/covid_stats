@@ -25,4 +25,7 @@ class CovidDb(DbConnector):
             WHERE type='table' AND name='{self.table_name}';
         ''').fetchone()[0] == 1
 
+    def close(self):
+        self.conn.close()
+
 
