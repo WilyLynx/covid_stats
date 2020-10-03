@@ -17,9 +17,7 @@ download_new_data = False
 db_ctx = CovidDb(DB_PATH)
 if db_ctx.table_exists():
     stats = db_ctx.getStats()
-    stats.loc[:, 'data'] = pd.to_datetime(stats['data'], format='%Y-%m-%d')
-    stats = stats.set_index('data')
-    if stats.index[0] < datetime.date.today():
+    if stats.index.max() < datetime.date.today():
         download_new_data = True
 
 else:
@@ -33,8 +31,7 @@ if download_new_data:
     db_ctx.insertStats(stats)
 
 db_ctx.close()
-
-plotter = BasePlotter(stats)
+plotter = BasePlotter(stats.last('3M'))
 
 plotter.plot_active()
 

@@ -21,7 +21,7 @@ class MinskPSSEParser:
         covid_stats = pd.DataFrame(covid_stats,
                                    columns=['data', 'kwarantanna', 'hospitalizowani', 'potwierdzeni', 'ozdrowieńcy', 'zmarli'])
         covid_stats.loc[:, 'data'] = pd.to_datetime(covid_stats['data'], format='%d.%m.%Y')
-        covid_stats: DataFrame = covid_stats.set_index('data')
+        covid_stats: DataFrame = covid_stats.set_index('data').sort_index(ascending=True)
         return covid_stats
 
     def _get_messages(self):
