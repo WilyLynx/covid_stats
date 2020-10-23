@@ -9,38 +9,56 @@ class BasePlotter:
     def __init__(self, stats):
         self.stats = stats
 
-    def plot_active(self):
+    def generate_plot(self):
         sns.set(rc={'figure.figsize': (10, 6)})
         sns.set_style("whitegrid")
-        fig, ax = plt.subplots()
-        ax = sns.lineplot(x=self.stats.index, y=self.stats["aktywni"], ax=ax)
+        fig, axs = plt.subplots(1, 2)
+        plt.title('\n')
+        plt.suptitle(f'Covid-19 w powiecie mińskim [{self.stats.index.max().date().strftime("%d.%m.%Y")}]\n'
+                            f'Źródło danych: http://minsk.psse.waw.pl/', fontsize=14)
 
+        self._plot_active(axs[1])
+        self._plot_day_changes(axs[0])
+
+    def _plot_active(self, ax):
+        ax = sns.lineplot(x=self.stats.index, y=self.stats["aktywni"], ax=ax, legend='brief', label='Aktywni')
+        ax.set_ylabel('Aktywni')
+        ax.legend(loc='upper left')
+        self._format_asies(ax, self.stats['aktywni'])
+        self._add_last_day_dot(ax, self.stats['aktywni'])
+
+    def _plot_day_changes(self, ax):
+        new_cases = self.stats['potwierdzeni'].diff()
+        ax = sns.lineplot(x=self.stats.index, y=new_cases, ax=ax, legend='brief', label='Potwierdzeni')
+        self._add_last_day_dot(ax, new_cases)
+
+        healed = self.stats['ozdrowieńcy'].diff()
+        ax = sns.lineplot(x=self.stats.index, y=healed, ax=ax, legend='brief', label='Ozdrowieńcy')
+        self._add_last_day_dot(ax, healed)
+
+        ax.legend(loc='upper left')
+        y_max = max(healed.max(), new_cases.max())
+        ax.set_ylabel('Dzienna zmiana')
+        self._format_asies(ax, new_cases, y_max=y_max)
+
+    def _add_last_day_dot(self, ax, series):
         last_X = self.stats.index.max()
-        last_y = self.stats['aktywni'][last_X]
-        plt.plot([last_X], [last_y], 'bo')
+        last_y = series[last_X]
+        ax.plot([last_X], [last_y], 'bo')
+        label = "{:.0f}".format(last_y)
+        ax.annotate(label,
+                    (last_X, last_y),
+                    textcoords="offset points",
+                    xytext=(5, 10),
+                    ha='center')
 
-        ax.set_title(f'Aktywne przypadki covid-19 w powiecie mińskim\n Dane z dnia {last_X.date().strftime("%d.%m.%Y")}')
-        ax.text(1, 0, 'Źródło danych: http://minsk.psse.waw.pl/ ', fontsize=12, color='black',
-                horizontalalignment='right',
-                verticalalignment='bottom',
-                transform=ax.transAxes)
-
-        plt.ylabel('Aktywni')
+    def _format_asies(self, ax, series, y_max=None):
         plt.xlabel('Data')
-        locator = mdates.AutoDateLocator(minticks=9, maxticks=15)
+        locator = mdates.AutoDateLocator(minticks=3, maxticks=5)
         formatter = mdates.ConciseDateFormatter(locator)
         ax.xaxis.set_major_locator(locator)
         ax.xaxis.set_major_formatter(formatter)
-
         ax.set_xlim(self.stats.index.min(), self.stats.index.max() + pd.DateOffset(days=4))
-        ax.set_ylim(0, 1.1 * self.stats['aktywni'].max())
-        plt.subplots_adjust(left=0.1, bottom=0.25, right=0.9, top=0.9)
-
-        label = "{:.0f}".format(last_y)
-        plt.annotate(label,
-                     (last_X, last_y),
-                     textcoords="offset points",
-                     xytext=(5, 10),
-                     ha='center')
-
-        ax.grid(True)
+        if not y_max:
+            y_max = series.max()
+        ax.set_ylim(0, 1.1 * y_max)

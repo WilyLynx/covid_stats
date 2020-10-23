@@ -37,8 +37,8 @@ if download_new_data:
 
 db_ctx.close()
 
-plotter = sp.BasePlotter(stats.last('3M'))
-plotter.plot_active()
+plotter = sp.BasePlotter(stats.last('1M'))
+plotter.generate_plot()
 
 msg = tiw.TextInfoWriter(stats, minfo.MinskDistrictInfo()).get_facebook_msg()
 with open(os.path.join(FB_PATH, 'info.txt'), 'w') as f:
