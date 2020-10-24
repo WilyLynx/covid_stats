@@ -53,7 +53,7 @@ class BasePlotter:
                     ha='center')
 
     def _format_asies(self, ax, series, y_max=None):
-        plt.xlabel('Data')
+        ax.set_xlabel('Data')
         locator = mdates.AutoDateLocator(minticks=3, maxticks=5)
         formatter = mdates.ConciseDateFormatter(locator)
         ax.xaxis.set_major_locator(locator)
