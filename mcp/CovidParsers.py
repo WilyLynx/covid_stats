@@ -74,7 +74,9 @@ class MinskPSSEParser:
                     msg_data.append(None)
 
                 try:
-                    msg_data.append(int([r for r in rows if 'zgonów' in str(r)][0].contents[3].contents[0]))
+                    row = str([r for r in rows if 'zgonów' in str(r)][0])
+                    num = re.findall('[0-9]+', row)[1]
+                    msg_data.append(int(num))
                 except Exception:
                     msg_data.append(None)
 
