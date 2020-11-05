@@ -9,6 +9,7 @@ from mcp import StatsPlotter as sp
 from mcp import CovidDb as cdb
 from mcp import TextInfoWriter as tiw
 from mcp import MinskDistrictInfo as minfo
+from mcp import SafetyThresholds as st
 import locale
 
 MINISK_CSV = 'data/minsk.csv'
@@ -40,7 +41,7 @@ db_ctx.close()
 plotter = sp.BasePlotter(stats.last('31D'))
 plotter.generate_plot()
 
-msg = tiw.TextInfoWriter(stats, minfo.MinskDistrictInfo()).get_facebook_msg()
+msg = tiw.TextInfoWriter(stats, minfo.MinskDistrictInfo(), st.PolishThresholds()).get_facebook_msg()
 with open(os.path.join(FB_PATH, 'info.txt'), 'w') as f:
     f.write(msg)
 
