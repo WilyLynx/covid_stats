@@ -15,13 +15,13 @@ class BasePlotter:
         fig, axs = plt.subplots(1, 2)
         plt.title('\n')
         plt.suptitle(f'Covid-19 w powiecie mińskim [{self.stats.index.max().date().strftime("%d.%m.%Y")}]\n'
-                            f'Źródło danych: http://minsk.psse.waw.pl/', fontsize=14)
+                     f'Źródło danych: http://minsk.psse.waw.pl/', fontsize=14)
 
         self._plot_active(axs[1])
         self._plot_day_changes(axs[0])
 
     def _plot_active(self, ax):
-        ax = sns.lineplot(x=self.stats.index, y=self.stats["aktywni"], ax=ax, legend='brief', label='Aktywni')
+        ax.plot(self.stats.index, self.stats["aktywni"], 'bo-', label='Aktywni')
         ax.set_ylabel('Aktywni')
         ax.legend(loc='upper left')
         self._format_asies(ax, self.stats['aktywni'])
@@ -29,11 +29,11 @@ class BasePlotter:
 
     def _plot_day_changes(self, ax):
         new_cases = self.stats['potwierdzeni'].diff()
-        ax = sns.lineplot(x=self.stats.index, y=new_cases, ax=ax, legend='brief', label='Potwierdzeni')
+        ax.plot(self.stats.index, new_cases, 'ro-', label='Potwierdzeni')
         self._add_last_day_dot(ax, new_cases)
 
         healed = self.stats['ozdrowieńcy'].diff()
-        ax = sns.lineplot(x=self.stats.index, y=healed, ax=ax, legend='brief', label='Ozdrowieńcy')
+        ax.plot(self.stats.index, healed, 'bo-', label='Ozdrowieńcy')
         self._add_last_day_dot(ax, healed)
 
         ax.legend(loc='upper left')
@@ -44,7 +44,7 @@ class BasePlotter:
     def _add_last_day_dot(self, ax, series):
         last_X = self.stats.index.max()
         last_y = series[last_X]
-        ax.plot([last_X], [last_y], 'bo')
+        # ax.plot([last_X], [last_y], 'bo')
         label = "{:.0f}".format(last_y)
         ax.annotate(label,
                     (last_X, last_y),
@@ -54,7 +54,7 @@ class BasePlotter:
 
     def _format_asies(self, ax, series, y_max=None):
         ax.set_xlabel('Data')
-        locator = mdates.AutoDateLocator(minticks=3, maxticks=5)
+        locator = mdates.AutoDateLocator(minticks=5, maxticks=5)
         formatter = mdates.ConciseDateFormatter(locator)
         ax.xaxis.set_major_locator(locator)
         ax.xaxis.set_major_formatter(formatter)
