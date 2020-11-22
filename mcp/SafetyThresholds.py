@@ -3,6 +3,7 @@ class PolishThresholds:
         (2, 'zielony'),
         (10, 'źółty'),
         (25, 'czerwony'),
+        (50, 'fioletowy'),
         (70, 'czarny'),
     ]
 
