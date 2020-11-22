@@ -2,6 +2,7 @@ import datetime
 import os
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
 from mcp import CovidParsers as cp
@@ -37,6 +38,25 @@ if download_new_data:
     db_ctx.insertStats(stats)
 
 db_ctx.close()
+
+stats = stats[~stats.index.duplicated()]
+idx = pd.date_range(min(stats.index), max(stats.index))
+stats = stats.reindex(idx, fill_value=-1)
+
+
+last_index_with_value = None
+for index, row in stats.iterrows():
+    if last_index_with_value is not None:
+        day_diff = (index - last_index_with_value).days
+        if day_diff > 1:
+            for i, p in enumerate(['kwarantanna', 'hospitalizowani', 'potwierdzeni', 'ozdrowieńcy', 'zmarli', 'aktywni']):
+                last_v = stats.loc[last_index_with_value, p]
+                current_v = stats.loc[index, p]
+                stats.loc[last_index_with_value:index, p] = np.linspace(last_v, current_v, day_diff+1)
+    if row[0] != -1:
+        last_index_with_value = index
+    else:
+        continue
 
 plotter = sp.BasePlotter(stats.last('31D'))
 plotter.generate_plot()
